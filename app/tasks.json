@@ -1,0 +1,20 @@
+[
+  {
+    "subject": "Server is down",
+    "body": "Our production server is down. Please fix ASAP!",
+    "category": "incident",
+    "priority": "high"
+  },
+  {
+    "subject": "Billing issue",
+    "body": "I was charged twice this month.",
+    "category": "billing",
+    "priority": "medium"
+  },
+  {
+    "subject": "Feature request",
+    "body": "Can you add dark mode?",
+    "category": "feature",
+    "priority": "low"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "sender": "promo@shop.com",
+    "subject": "70% OFF SALE",
+    "body": "Limited time offer buy now",
+    "category": "spam",
+    "priority": "low"
+  },
+  {
+    "id": "2",
+    "sender": "user@gmail.com",
+    "subject": "Product damaged",
+    "body": "My item arrived broken and unusable",
+    "category": "complaint",
+    "priority": "high"
+  },
+  {
+    "id": "3",
+    "sender": "ceo@company.com",
+    "subject": "URGENT: System down",
+    "body": "Production outage fix immediately",
+    "category": "escalation",
+    "priority": "high"
+  }
+]

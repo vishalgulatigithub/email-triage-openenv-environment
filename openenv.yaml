@@ -1,0 +1,65 @@
+name: email-triage-openenv
+description: RL environment for intelligent email triage including classification, prioritization, and response generation.
+
+entrypoint: app.main:app
+
+endpoints:
+  reset: /reset
+  step: /step
+  state: /state
+  tasks: /tasks
+  grader: /grader
+  baseline: /baseline
+
+actions:
+  action_type:
+    type: string
+    enum: [pick_email, analyze, classify, respond, finish]
+
+  email_id:
+    type: string
+    required: false
+
+  category:
+    type: string
+    required: false
+
+  priority:
+    type: string
+    required: false
+
+  response_text:
+    type: string
+    required: false
+
+observations:
+  inbox:
+    type: list
+  current_email:
+    type: object
+  stage:
+    type: string
+  history:
+    type: list
+  extracted:
+    type: object
+  remaining_steps:
+    type: integer
+
+reward:
+  type: float
+  description: Reward based on workflow correctness, classification accuracy, and efficiency.
+
+done:
+  type: boolean
+
+info:
+  type: object
+
+baseline:
+  description: Rule-based baseline agent for email triage
+  endpoint: /baseline
+
+grader:
+  description: Returns last step score
+  endpoint: /grader

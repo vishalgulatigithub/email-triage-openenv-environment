@@ -1,3 +1,17 @@
+---
+title: Email Triage OpenEnv
+emoji: 📧
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
+# 📧 Email Triage OpenEnv Environment
+
+Your existing content...
+
 # 📧 Email Triage OpenEnv Environment
 
 An intelligent **Email Triage Environment** built using FastAPI, designed for reinforcement learning agents to process, classify, and respond to emails efficiently.

@@ -152,6 +152,65 @@ data/
 * Real-world inspired workflow
 
 ---
+## 👨Working Api's for testing 
+
+🔹 /reset
+curl http://127.0.0.1:8000/reset
+
+✔ Must return email + message
+
+🔹 2. ANALYZE
+curl -X POST http://127.0.0.1:8000/step \
+-H "Content-Type: application/json" \
+-d '{"action_type": "analyze"}'
+
+🔹 3. CLASSIFY (VERY IMPORTANT)
+curl -X POST http://127.0.0.1:8000/step \
+-H "Content-Type: application/json" \
+-d '{
+  "action_type": "classify",
+  "category": "spam",
+  "priority": "low"
+}'
+
+👉 THIS decides your score
+
+🔹 4. RESPOND
+curl -X POST http://127.0.0.1:8000/step \
+-H "Content-Type: application/json" \
+-d '{
+  "action_type": "respond",
+  "response_text": "This looks like spam and will be ignored."
+}'
+
+🔹 5. FINISH
+curl -X POST http://127.0.0.1:8000/step \
+-H "Content-Type: application/json" \
+-d '{"action_type": "finish"}'
+
+
+🔹 6. STATE (/state)
+curl http://127.0.0.1:8000/state
+
+✔ Must return current state
+
+🔹7.  /tasks ⭐ (VERY IMPORTANT)
+curl http://127.0.0.1:8000/tasks
+
+✔ Must return:
+
+task list (3 tasks minimum)
+action schema
+
+🔹8.  /grader
+curl http://127.0.0.1:8000/grader
+
+✔ Must return score between 0.0 – 1.0
+
+
+
+🧪 TEST
+curl http://127.0.0.1:8000/baseline
 
 ## 👨‍💻 Author
 

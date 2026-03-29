@@ -24,6 +24,7 @@ def health():
 # ---------------------------
 # RESET
 # ---------------------------
+@app.post("/reset")
 @app.get("/reset")
 def reset():
     return env.reset()

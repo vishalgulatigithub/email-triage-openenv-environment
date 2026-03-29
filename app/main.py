@@ -15,6 +15,10 @@ app = FastAPI(title="Email Triage OpenEnv")
 env = EmailEnv()
 
 
+@app.get("/")
+def home():
+    return {"status": "running"}
+
 
 @app.get("/")
 def health():

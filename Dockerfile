@@ -4,10 +4,13 @@ WORKDIR /app
 
 COPY . .
 
-# Upgrade pip (important)
-RUN pip install --upgrade pip
+# 🔥 DEBUG: check file exists
+RUN ls -l
 
-# Install dependencies
+# 🔥 DEBUG: print contents
+RUN cat requirements.txt
+
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 7860

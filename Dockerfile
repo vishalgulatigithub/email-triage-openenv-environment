@@ -4,14 +4,10 @@ WORKDIR /app
 
 COPY . .
 
-# 🔥 DEBUG: check file exists
-RUN ls -l
-
-# 🔥 DEBUG: print contents
-RUN cat requirements.txt
-
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+
+# FORCE INSTALL (bypass requirements.txt issue)
+RUN pip install fastapi uvicorn pydantic requests python-dotenv openai
 
 EXPOSE 7860
 

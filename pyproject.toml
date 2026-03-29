@@ -22,11 +22,11 @@ dependencies = [
 [tool.setuptools]
 packages = ["app", "server", "baseline"]
 
-# ✅ REQUIRED ENTRYPOINT
+# REQUIRED ENTRYPOINT
 [project.scripts]
 server = "server.app:main"
 
-# ✅ BUILD SYSTEM
+# BUILD SYSTEM
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"

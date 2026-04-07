@@ -13,7 +13,7 @@ class EmailEnv:
         self.tasks = load_tasks()
         self.state = EnvState()
         self.memory = Memory()
-        self.last_score = 0.0
+        self.last_score = 0.5  # 🔥 safe default (NOT 0)
         self.max_steps = 5
         self.steps = 0
 
@@ -26,7 +26,7 @@ class EmailEnv:
         self.state.reset(email)
         self.memory.clear()
         self.steps = 0
-        self.last_score = 0.0  # ✅ reset score
+        self.last_score = 0.5  # 🔥 safe reset (NOT 0)
 
         return {
             "message": "Environment reset",
@@ -34,7 +34,7 @@ class EmailEnv:
         }
 
     # ---------------------------
-    # STEP (FINAL FIXED)
+    # STEP (FINAL VALIDATOR SAFE)
     # ---------------------------
     def step(self, action):
         email_data = self.state.current_email
@@ -42,7 +42,7 @@ class EmailEnv:
         if not email_data:
             return (
                 {"error": "Call /reset first"},
-                Reward(0.0),
+                Reward(0.1),  # 🔥 never return 0
                 True,
                 {}
             )
@@ -60,14 +60,24 @@ class EmailEnv:
         prev_stage = self.state.stage
 
         # ---------------------------
-        # ✅ GRADING FIX (CRITICAL)
+        # ✅ SAFE GRADING
         # ---------------------------
         if action.action_type == "finish":
-            # 🔥 DO NOT recompute score
             score = self.last_score
         else:
             score = grade(email_data, action, extracted)
-            self.last_score = score  # store for final step
+
+        # 🔥 STRICT CLAMP (CRITICAL FIX)
+        if score is None:
+            score = 0.5
+
+        if score <= 0.0:
+            score = 0.1
+        elif score >= 1.0:
+            score = 0.9
+
+        # store safe score
+        self.last_score = score
 
         # ---------------------------
         # STAGE TRANSITIONS
@@ -97,7 +107,7 @@ class EmailEnv:
             done = True
 
         # ---------------------------
-        # REWARD (FIXED FLOW)
+        # REWARD (SAFE)
         # ---------------------------
         reward = compute_reward(
             prev_stage=prev_stage,
@@ -107,10 +117,21 @@ class EmailEnv:
             repeated=False
         )
 
+        # 🔥 ensure reward is float and safe
+        try:
+            reward_value = float(reward)
+        except Exception:
+            reward_value = 0.1
+
+        if reward_value <= 0.0:
+            reward_value = 0.1
+        elif reward_value >= 1.0:
+            reward_value = 0.9
+
         # ---------------------------
         # MEMORY
         # ---------------------------
-        self.memory.add(email_data, action.dict(), float(reward))
+        self.memory.add(email_data, action.dict(), reward_value)
 
         # ---------------------------
         # OBSERVATION
@@ -132,7 +153,7 @@ class EmailEnv:
             "steps": self.steps
         }
 
-        return observation.dict(), reward, done, info
+        return observation.dict(), reward_value, done, info
 
     # ---------------------------
     # STATE

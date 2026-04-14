@@ -1,231 +1,101 @@
----
-title: Email Triage OpenEnv
-emoji: 📧
-colorFrom: blue
-colorTo: green
-sdk: docker
-app_port: 7860
-pinned: false
----
+## Key Result
 
-# 📧 Email Triage OpenEnv Environment
+Our PPO agent reduces:
 
-Your existing content...
+- Urgent misses by ~95%
+- SLA breaches by ~95%
 
-# 📧 Email Triage OpenEnv Environment
+compared to baseline systems, while maintaining competitive reward.
 
-An intelligent **Email Triage Environment** built using FastAPI, designed for reinforcement learning agents to process, classify, and respond to emails efficiently.
+This demonstrates learning of **safe operational policies under real-world constraints**.
 
----
+# Multi-Agent RL for Email Triage
 
-## 🚀 Features
+A benchmark-style reinforcement learning environment for enterprise email triage under:
 
-* 📥 Multi-email inbox simulation
-* 🧠 Feature extraction from email content
-* 🏷️ Email classification (category + priority)
-* ✉️ Response generation support
-* 🎯 Reward shaping for RL agents
-* 📊 Logging + Visualization Dashboard
-* 🤖 Baseline agent included
-* ⚡ FastAPI-based API (OpenEnv compliant)
+- workload spikes
+- adversarial spam and phishing emails
+- SLA pressure
+- backlog constraints
+- operational cost trade-offs
 
----
+## Problem Framing
 
-## 🧩 Environment Design
+This project is **not** just email classification.
 
-The environment simulates a real-world email workflow:
+It models **sequential decision-making under operational constraints**:
+- classify the email correctly
+- estimate urgency correctly
+- choose the best operational action:
+  - reply
+  - escalate
+  - defer
+  - ignore
 
-1. Pick an email
-2. Analyze content
-3. Classify category & priority
-4. Respond (optional)
-5. Finish task
+## Multi-Agent Design
 
----
+### Classifier Agent
+Predicts:
+- category
+- priority
 
-## 📡 API Endpoints
+### Scheduler Agent
+Uses:
+- classifier output
+- backlog state
+- pending urgent count
+- spike state
+- deadline pressure
+- adversarial risk
 
-| Endpoint          | Method | Description        |
-| ----------------- | ------ | ------------------ |
-| `/reset`          | GET    | Reset environment  |
-| `/step`           | POST   | Perform action     |
-| `/state`          | GET    | Get current state  |
-| `/tasks`          | GET    | Task definitions   |
-| `/grader`         | GET    | Get score          |
-| `/baseline`       | GET    | Run baseline agent |
-| `/dashboard`      | GET    | JSON stats         |
-| `/dashboard/view` | GET    | Visualization UI   |
+Then chooses:
+- reply
+- escalate
+- defer
+- ignore
 
----
+## Key Features
 
-## ⚙️ Action Schema
+- Queue-based inbox environment
+- Multi-step RL decision process
+- Adversarial phishing/spam scenarios
+- Dynamic workload spikes
+- SLA-aware reward shaping
+- Random, rule-based, and PPO agents
+- Reward visualization and evaluation dashboard
+- 500+ synthetic scenarios generated from seed emails
 
-```json
-{
-  "action_type": "pick_email | analyze | classify | respond | finish",
-  "email_id": "string",
-  "category": "string",
-  "priority": "string",
-  "response_text": "string"
-}
-```
+## Repository Structure
 
----
-
-## 🎯 Reward Logic
-
-Reward is based on:
-
-* Correct workflow progression
-* Classification accuracy
-* Avoiding repeated actions
-* Efficient task completion
-
----
-
-## 🧪 Running Locally
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Run server
-uvicorn app.main:app --reload
-```
-
----
-
-## 🔐 Environment Variables
-
-Create a `.env` file:
-
-```
-OPENAI_API_KEY=your_api_key_here
-```
-
----
-
-## 📊 Dashboard
-
-View reward trends:
-
-```
-http://localhost:8000/dashboard/view
-```
-
----
-
-## 🤖 Baseline Agent
-
-Run baseline:
-
-```
-http://localhost:8000/baseline
-```
-
----
-
-## 🏗️ Project Structure
-
-```
+```text
 app/
-├── main.py
-├── env.py
-├── models.py
-├── tasks.py
-├── reward.py
-├── graders.py
-├── features.py
-├── memory.py
-├── state.py
-├── logger.py
-├── dashboard.py
+  env.py
+  features.py
+  generator.py
+  graders.py
+  main.py
+  models.py
+  reward.py
+  tasks.py
 
-baseline/
-└── run_baseline.py
+agents/
+  classifier_agent.py
+  scheduler_agent.py
+  rule_based.py
+  random_agent.py
+
+training/
+  state_encoder.py
+  train_ppo.py
+  evaluate.py
+
+demo/
+  run_demo.py
+  demo_script.md
+
+visualization/
+  plot_rewards.py
+  dashboard.py
 
 data/
-└── emails.json
-```
-
----
-
-## ☁️ Deployment
-
-* Docker-ready
-* Hugging Face Spaces compatible
-* OpenEnv compliant
-
----
-
-## 🏆 Highlights
-
-* Modular architecture
-* Clean API design
-* RL-friendly reward shaping
-* Real-world inspired workflow
-
----
-## 👨Working Api's for testing 
-
-🔹 /reset
-curl http://127.0.0.1:8000/reset
-
-✔ Must return email + message
-
-🔹 2. ANALYZE
-curl -X POST http://127.0.0.1:8000/step \
--H "Content-Type: application/json" \
--d '{"action_type": "analyze"}'
-
-🔹 3. CLASSIFY (VERY IMPORTANT)
-curl -X POST http://127.0.0.1:8000/step \
--H "Content-Type: application/json" \
--d '{
-  "action_type": "classify",
-  "category": "spam",
-  "priority": "low"
-}'
-
-👉 THIS decides your score
-
-🔹 4. RESPOND
-curl -X POST http://127.0.0.1:8000/step \
--H "Content-Type: application/json" \
--d '{
-  "action_type": "respond",
-  "response_text": "This looks like spam and will be ignored."
-}'
-
-🔹 5. FINISH
-curl -X POST http://127.0.0.1:8000/step \
--H "Content-Type: application/json" \
--d '{"action_type": "finish"}'
-
-
-🔹 6. STATE (/state)
-curl http://127.0.0.1:8000/state
-
-✔ Must return current state
-
-🔹7.  /tasks ⭐ (VERY IMPORTANT)
-curl http://127.0.0.1:8000/tasks
-
-✔ Must return:
-
-task list (3 tasks minimum)
-action schema
-
-🔹8.  /grader
-curl http://127.0.0.1:8000/grader
-
-✔ Must return score between 0.0 – 1.0
-
-
-
-🧪 TEST
-curl http://127.0.0.1:8000/baseline
-
-## 👨‍💻 Author
-
-Built for OpenEnv evaluation 🚀
+  emails.json

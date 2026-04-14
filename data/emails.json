@@ -1,26 +1,162 @@
 [
   {
-    "id": "1",
-    "sender": "promo@shop.com",
-    "subject": "70% OFF SALE",
-    "body": "Limited time offer buy now",
-    "category": "spam",
-    "priority": "low"
-  },
-  {
-    "id": "2",
-    "sender": "user@gmail.com",
-    "subject": "Product damaged",
-    "body": "My item arrived broken and unusable",
+    "id": "seed-001",
+    "sender": "customer@shopmail.com",
+    "subject": "Damaged item received and need replacement",
+    "body": "I received a damaged item and need a replacement as soon as possible.",
     "category": "complaint",
     "priority": "high"
   },
   {
-    "id": "3",
+    "id": "seed-002",
+    "sender": "finance@client-enterprise.com",
+    "subject": "Invoice discrepancy for March billing",
+    "body": "We noticed a discrepancy in the billed amount and need clarification today.",
+    "category": "billing",
+    "priority": "high"
+  },
+  {
+    "id": "seed-003",
+    "sender": "ops@company.com",
+    "subject": "Production issue blocking users",
+    "body": "A production workflow is failing and several users are blocked right now.",
+    "category": "support",
+    "priority": "critical"
+  },
+  {
+    "id": "seed-004",
+    "sender": "noreply@updates.com",
+    "subject": "Weekly product updates newsletter",
+    "body": "Here are the latest product and company updates for this week.",
+    "category": "newsletter",
+    "priority": "low"
+  },
+  {
+    "id": "seed-005",
+    "sender": "promo@offers-mail.com",
+    "subject": "Claim your exclusive reward now",
+    "body": "Click now to claim your limited time reward.",
+    "category": "spam",
+    "priority": "low"
+  },
+  {
+    "id": "seed-006",
+    "sender": "security@account-alerts.net",
+    "subject": "URGENT: Verify account immediately",
+    "body": "Your account may be disabled unless you verify credentials through the secure link now.",
+    "category": "phishing",
+    "priority": "high"
+  },
+  {
+    "id": "seed-007",
     "sender": "ceo@company.com",
-    "subject": "URGENT: System down",
-    "body": "Production outage fix immediately",
+    "subject": "Critical client issue needs immediate attention",
+    "body": "A major client is impacted and leadership visibility is required immediately.",
     "category": "escalation",
+    "priority": "critical"
+  },
+  {
+    "id": "seed-008",
+    "sender": "support@vendor.com",
+    "subject": "Following up on your open support request",
+    "body": "We are checking on the previous support issue and need your confirmation.",
+    "category": "support",
+    "priority": "medium"
+  },
+  {
+    "id": "seed-009",
+    "sender": "billing@service.com",
+    "subject": "Payment failed for latest invoice",
+    "body": "The latest payment attempt failed and needs review before end of day.",
+    "category": "billing",
+    "priority": "high"
+  },
+  {
+    "id": "seed-010",
+    "sender": "customer2@shopmail.com",
+    "subject": "Refund request for incorrect order",
+    "body": "I was charged for the wrong item and need a refund quickly.",
+    "category": "complaint",
+    "priority": "high"
+  },
+  {
+    "id": "seed-011",
+    "sender": "partner@enterprise.com",
+    "subject": "Need update on integration issue",
+    "body": "The client integration issue is still unresolved. Please share an update when possible.",
+    "category": "support",
+    "priority": "medium"
+  },
+  {
+    "id": "seed-012",
+    "sender": "marketing@vendor.com",
+    "subject": "New launch assets and promotional kit",
+    "body": "Please find the launch assets and promo kit attached for this week.",
+    "category": "general",
+    "priority": "low"
+  },
+  {
+    "id": "seed-013",
+    "sender": "vip-client@enterprise.com",
+    "subject": "Urgent issue impacting our team today",
+    "body": "This issue is impacting our team and needs urgent review today.",
+    "category": "escalation",
+    "priority": "high"
+  },
+  {
+    "id": "seed-014",
+    "sender": "rewards@deal-center.com",
+    "subject": "Immediate action required for reward claim",
+    "body": "Act immediately to secure your reward and avoid losing the offer.",
+    "category": "spam",
+    "priority": "medium"
+  },
+  {
+    "id": "seed-015",
+    "sender": "hr@company.com",
+    "subject": "Please review updated policy notice",
+    "body": "Please review the updated policy notice this week.",
+    "category": "general",
+    "priority": "low"
+  },
+  {
+    "id": "seed-016",
+    "sender": "finance@company.com",
+    "subject": "Payroll approval needed urgently",
+    "body": "Payroll approval is pending and needs review immediately.",
+    "category": "billing",
+    "priority": "critical"
+  },
+  {
+    "id": "seed-017",
+    "sender": "cto@company.com",
+    "subject": "System down for key workflow",
+    "body": "A key workflow is down in production and multiple customers are affected.",
+    "category": "escalation",
+    "priority": "critical"
+  },
+  {
+    "id": "seed-018",
+    "sender": "newsletter@vendor.com",
+    "subject": "Monthly community digest",
+    "body": "Here is your monthly digest of community news and updates.",
+    "category": "newsletter",
+    "priority": "low"
+  },
+  {
+    "id": "seed-019",
+    "sender": "customer3@shopmail.com",
+    "subject": "Package missing items",
+    "body": "My package arrived with missing items and I need support resolving this issue.",
+    "category": "complaint",
+    "priority": "medium"
+  },
+  {
+    "id": "seed-020",
+    "sender": "alerts@it-ops.com",
+    "subject": "Repeated API failures detected",
+    "body": "Repeated API failures are affecting client traffic and require immediate review.",
+    "category": "support",
     "priority": "high"
   }
 ]

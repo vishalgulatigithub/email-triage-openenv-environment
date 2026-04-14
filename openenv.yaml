@@ -1,65 +1,43 @@
 name: email-triage-openenv
-description: RL environment for intelligent email triage including classification, prioritization, and response generation.
+version: 0.1.0
+description: Multi-agent RL environment for enterprise email triage with adversarial emails, workload spikes, and SLA pressure
 
-entrypoint: app.main:app
+server:
+  host: 0.0.0.0
+  port: 8000
 
-endpoints:
-  reset: /reset
-  step: /step
-  state: /state
-  tasks: /tasks
-  grader: /grader
-  baseline: /baseline
+environment:
+  module: app.env
+  class: EmailEnv
 
-actions:
-  action_type:
-    type: string
-    enum: [pick_email, analyze, classify, respond, finish]
+api:
+  app_module: app.main
+  app_variable: app
 
-  email_id:
-    type: string
-    required: false
+agents:
+  classifier:
+    module: agents.classifier_agent
+    function: classify_email
+  scheduler:
+    module: agents.scheduler_agent
+    function: schedule_email
+  rule_based:
+    module: agents.rule_based
+    function: rule_based_agent
+  random:
+    module: agents.random_agent
+    function: random_agent
 
-  category:
-    type: string
-    required: false
+training:
+  module: training.train_ppo
+  function: train
 
-  priority:
-    type: string
-    required: false
+evaluation:
+  module: training.evaluate
+  compare_function: compare_agents
+  evaluate_function: evaluate_agent
 
-  response_text:
-    type: string
-    required: false
-
-observations:
-  inbox:
-    type: list
-  current_email:
-    type: object
-  stage:
-    type: string
-  history:
-    type: list
-  extracted:
-    type: object
-  remaining_steps:
-    type: integer
-
-reward:
-  type: float
-  description: Reward based on workflow correctness, classification accuracy, and efficiency.
-
-done:
-  type: boolean
-
-info:
-  type: object
-
-baseline:
-  description: Rule-based baseline agent for email triage
-  endpoint: /baseline
-
-grader:
-  description: Returns last step score
-  endpoint: /grader
+artifacts:
+  checkpoint_dir: training/checkpoints
+  rewards_csv: training/checkpoints/episode_rewards.csv
+  reward_plot: visualization/reward_curve.png

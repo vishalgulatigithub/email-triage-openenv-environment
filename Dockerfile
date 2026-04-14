@@ -1,20 +1,17 @@
-FROM python:3.10
+FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY . .
-
-# Prevent buffering issues
+ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install deps
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir fastapi uvicorn pydantic requests python-dotenv openai
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# HF requires this
-ENV PORT=7860
+COPY . .
 
-EXPOSE 7860
+EXPOSE 8000
+EXPOSE 8501
 
-# 🔥 CRITICAL: use shell form for env variable
-CMD uvicorn app.main:app --host 0.0.0.0 --port $PORT
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

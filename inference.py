@@ -1,142 +1,93 @@
-import requests
-import os
-from openai import OpenAI
+from __future__ import annotations
 
-BASE_URL = "http://localhost:7860"
+import argparse
+import json
 
-# ---------------------------
-# SAFE API CALLS
-# ---------------------------
-def reset():
-    try:
-        res = requests.post(f"{BASE_URL}/reset", timeout=5)
-        return res.json()
-    except Exception:
-        return {}
+import torch
 
-def step(action):
-    try:
-        res = requests.post(f"{BASE_URL}/step", json=action, timeout=5)
-        return res.json()
-    except Exception:
-        return {"reward": 0.1, "done": True, "state": {}}
+from app.env import EmailEnv
+from agents.rule_based import rule_based_agent
+from agents.random_agent import random_agent
+from training.state_encoder import encode_state, get_state_dim
+from training.train_ppo import PPOPolicy, action_indices_to_env_action
 
 
-# ---------------------------
-# LLM CLIENT (MANDATORY)
-# ---------------------------
-client = OpenAI(
-    base_url=os.environ.get("API_BASE_URL"),
-    api_key=os.environ.get("API_KEY")
-)
+def load_ppo_policy(checkpoint_path: str) -> PPOPolicy:
+    policy = PPOPolicy(input_dim=get_state_dim())
+    state_dict = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    policy.load_state_dict(state_dict)
+    policy.eval()
+    return policy
 
 
-# ---------------------------
-# SAFE LLM DECISION
-# ---------------------------
-def decide_action(state):
-    try:
-        prompt = f"""
-        You are an email triage agent.
+def choose_action(agent_name: str, observation, policy=None):
+    if agent_name == "rule":
+        return rule_based_agent(observation)
 
-        Current state:
-        {str(state)[:1000]}
+    if agent_name == "random":
+        return random_agent(observation)
 
-        Choose ONE action from:
-        analyze, classify, respond, finish
-
-        Return ONLY the action name.
-        """
-
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "Return only one word."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0,
-            timeout=5
+    if agent_name == "ppo":
+        if policy is None:
+            raise ValueError("PPO policy required for ppo inference")
+        state = encode_state(observation)
+        with torch.no_grad():
+            category_idx, priority_idx, schedule_idx, _, _ = policy.act(state)
+        return action_indices_to_env_action(
+            observation=observation,
+            category_idx=category_idx,
+            priority_idx=priority_idx,
+            schedule_idx=schedule_idx,
         )
 
-        action_text = response.choices[0].message.content.strip().lower()
-
-        if action_text not in ["analyze", "classify", "respond", "finish"]:
-            action_text = "analyze"
-
-        action = {"action_type": action_text}
-
-        # Add extra fields if needed
-        if action_text == "classify":
-            action["category"] = "important"
-        elif action_text == "respond":
-            action["response_text"] = "Thank you for your email."
-
-        return action
-
-    except Exception:
-        # 🔴 NEVER FAIL
-        return {"action_type": "analyze"}
+    raise ValueError(f"Unsupported agent: {agent_name}")
 
 
-# ---------------------------
-# MAIN EXECUTION
-# ---------------------------
+def run(agent_name: str, checkpoint_path: str = "training/checkpoints/ppo_email_triage.pt"):
+    env = EmailEnv()
+    observation = env.reset()
+    done = False
+    total_reward = 0.0
+
+    policy = None
+    if agent_name == "ppo":
+        policy = load_ppo_policy(checkpoint_path)
+
+    trajectory = []
+
+    while not done:
+        action = choose_action(agent_name, observation, policy)
+        next_observation, reward, done, info = env.step(action)
+
+        trajectory.append(
+            {
+                "email_id": action.email_id,
+                "classify_category": action.classify_category,
+                "classify_priority": action.classify_priority,
+                "schedule_action": action.schedule_action,
+                "reward": float(reward),
+                "grading": info.get("grading", {}),
+            }
+        )
+
+        total_reward += float(reward)
+        observation = next_observation
+
+    result = {
+        "agent": agent_name,
+        "total_reward": total_reward,
+        "steps": len(trajectory),
+        "trajectory": trajectory,
+    }
+
+    print(json.dumps(result, indent=2))
+    return result
+
+
 if __name__ == "__main__":
-    num_tasks = 3  # 🔥 REQUIRED
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--agent", choices=["random", "rule", "ppo"], default="rule")
+    parser.add_argument("--checkpoint", default="training/checkpoints/ppo_email_triage.pt")
+    args = parser.parse_args()
 
-    for task_id in range(num_tasks):
-        task_name = f"EMAIL_TRIAGE_{task_id}"
-
-        # START
-        print(f"[START] task={task_name}", flush=True)
-
-        state = reset()
-
-        total_steps = 0
-        total_reward = 0.0
-        done = False
-        max_steps = 20
-
-        while not done and total_steps < max_steps:
-            try:
-                action = decide_action(state)
-
-                result = step(action)
-
-                reward = result.get("reward", 0.1)
-                done = result.get("done", False)
-
-                # 🔥 ensure valid reward
-                if reward <= 0:
-                    reward = 0.1
-                elif reward >= 1:
-                    reward = 0.9
-
-                total_reward += reward
-                total_steps += 1
-
-                print(f"[STEP] step={total_steps} reward={reward}", flush=True)
-
-                state = result.get("state", {})
-
-            except Exception:
-                # fallback step
-                total_steps += 1
-                print(f"[STEP] step={total_steps} reward=0.1", flush=True)
-                break
-
-        # ---------------------------
-        # FINAL SCORE FIX
-        # ---------------------------
-        score = total_reward
-
-        if score <= 0:
-            score = 0.1
-        elif score >= 1:
-            score = 0.9
-
-        # END
-        print(
-            f"[END] task={task_name} score={score} steps={total_steps}",
-            flush=True
-        )
+    run(agent_name=args.agent, checkpoint_path=args.checkpoint)

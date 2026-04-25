@@ -2,24 +2,43 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    STREAMLIT_SERVER_HEADLESS=true \
+    STREAMLIT_SERVER_FILE_WATCHER_TYPE=none \
+    BROWSER_GATHER_USAGE_STATS=false
 
-# Streamlit config
-ENV STREAMLIT_SERVER_PORT=7860
-ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
-ENV STREAMLIT_SERVER_HEADLESS=true
-ENV STREAMLIT_SERVER_FILE_WATCHER_TYPE=none
-ENV BROWSER_GATHER_USAGE_STATS=false
+RUN apt-get update && apt-get install -y --no-install-recommends nginx && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 7860
-EXPOSE 8000
+RUN printf '%s\n' \
+'events {}' \
+'http {' \
+'  include /etc/nginx/mime.types;' \
+'  server {' \
+'    listen 7860;' \
+'    client_max_body_size 100M;' \
+'    location /api/ {' \
+'      proxy_pass http://127.0.0.1:8000/;' \
+'      proxy_http_version 1.1;' \
+'      proxy_set_header Host $host;' \
+'      proxy_set_header X-Forwarded-Prefix /api;' \
+'    }' \
+'    location / {' \
+'      proxy_pass http://127.0.0.1:8501/;' \
+'      proxy_http_version 1.1;' \
+'      proxy_set_header Host $host;' \
+'      proxy_set_header Upgrade $http_upgrade;' \
+'      proxy_set_header Connection "upgrade";' \
+'      proxy_read_timeout 86400;' \
+'    }' \
+'  }' \
+'}' > /etc/nginx/nginx.conf
 
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 8000 & streamlit run visualization/dashboard.py --server.port=7860 --server.address=0.0.0.0 --server.headless=true --server.fileWatcherType=none --browser.gatherUsageStats=false"]
+EXPOSE 7860
+
+CMD ["sh", "-c", "python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --root-path /api & streamlit run visualization/dashboard.py --server.port=8501 --server.address=127.0.0.1 --server.headless=true --server.fileWatcherType=none --browser.gatherUsageStats=false & exec nginx -g 'daemon off;'"]

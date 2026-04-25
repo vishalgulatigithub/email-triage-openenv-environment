@@ -20,3 +20,7 @@ logs/
 # Git
 
 .git
+
+# Visualization png
+
+visualization/*.png

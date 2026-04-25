@@ -354,56 +354,173 @@ data/
   emails.json
 
 
-Postman Friendly Curls
+## 🔌 API Testing with cURL / Postman
 
-1. START SERVER
+The deployed Hugging Face Space exposes:
 
-uvicorn app.main:app --reload
+- **Streamlit Dashboard:** `/`
+- **FastAPI API:** `/api/*`
 
+Base URL:
 
-2. RESET
-
-curl -X POST http://127.0.0.1:8000/reset
-
-
-3. STATE
-
-curl http://127.0.0.1:8000/state
+```bash
+https://vishalgulatinitj-email-triage-openenv.hf.space
 
 
-4. Manual step (simulate agent)
+# ============================================================
+# 1. Dashboard Check
+# ============================================================
 
-curl -X POST http://127.0.0.1:8000/step
--H "Content-Type: application/json"
--d "{\"email_id\": \"seed-001\", \"classify_category\": \"complaint\", \"classify_priority\": \"high\", \"schedule_action\": \"reply\", \"response_text\": \"We are resolving your issue.\"}"
-
-
-Shows:
-
-reward
-grading
-metrics update
+curl -X GET "https://vishalgulatinitj-email-triage-openenv.hf.space/"
 
 
-5. EVALUATE RULE AGENT
+# ============================================================
+# 2. FastAPI Docs
+# ============================================================
 
-curl "http://127.0.0.1:8000/evaluate_agent?agent_type=rule&num_episodes=5"
-
-
-6.Evaluate PPO agent
-
-curl "http://127.0.0.1:8000/evaluate_agent?agent_type=ppo&num_episodes=5"
+curl -X GET "https://vishalgulatinitj-email-triage-openenv.hf.space/api/docs"
 
 
-7. Compare all agents (IMPORTANT)
+# ============================================================
+# 3. OpenAPI Schema
+# ============================================================
 
-curl "http://127.0.0.1:8000/compare_agents?num_episodes=10"
+curl -X GET "https://vishalgulatinitj-email-triage-openenv.hf.space/api/openapi.json"
 
 
+# ============================================================
+# 4. List All API Endpoints
+# ============================================================
 
-🧠 Optional: output (Windows PowerShell)
+curl -s "https://vishalgulatinitj-email-triage-openenv.hf.space/api/openapi.json" | python -c "import sys,json; d=json.load(sys.stdin); print('\n'.join([m.upper()+' '+p for p,ops in d['paths'].items() for m in ops.keys()]))"
 
-curl "http://127.0.0.1:8000/compare_agents?num_episodes=10" | ConvertFrom-Json
+
+# ============================================================
+# 5. API Root 
+# ============================================================
+
+curl -X GET "https://vishalgulatinitj-email-triage-openenv.hf.space/api/"
+
+
+# ============================================================
+# 6. Evaluate Random Agent
+# ============================================================
+
+curl -X GET "https://vishalgulatinitj-email-triage-openenv.hf.space/api/evaluate_agent?agent_type=random&num_episodes=10"
+
+
+# ============================================================
+# 7. Evaluate Rule-Based Agent
+# ============================================================
+
+curl -X GET "https://vishalgulatinitj-email-triage-openenv.hf.space/api/evaluate_agent?agent_type=rule&num_episodes=10"
+
+
+# ============================================================
+# 8. Evaluate PPO Agent
+# ============================================================
+
+curl -X GET "https://vishalgulatinitj-email-triage-openenv.hf.space/api/evaluate_agent?agent_type=ppo&num_episodes=10&checkpoint_path=training/checkpoints/ppo_email_triage.pt"
+
+
+# ============================================================
+# 9. Compare All Agents
+# ============================================================
+
+curl -X GET "https://vishalgulatinitj-email-triage-openenv.hf.space/api/compare_agents?num_episodes=10&checkpoint_path=training/checkpoints/ppo_email_triage.pt"
+
+
+# ============================================================
+# 10. Reset Environment
+# ============================================================
+
+curl -X POST "https://vishalgulatinitj-email-triage-openenv.hf.space/api/reset"
+
+
+# ============================================================
+# 11. Step Environment — Support Reply
+# ============================================================
+
+curl -X POST "https://vishalgulatinitj-email-triage-openenv.hf.space/api/step" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "classify_category": "support",
+    "classify_priority": "high",
+    "schedule_action": "reply",
+    "response_text": "We are checking this issue immediately.",
+    "rationale": "Urgent support issue should be handled quickly."
+  }'
+
+
+# ============================================================
+# 12. Step Environment — Critical Escalation
+# ============================================================
+
+curl -X POST "https://vishalgulatinitj-email-triage-openenv.hf.space/api/step" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "classify_category": "support",
+    "classify_priority": "critical",
+    "schedule_action": "escalate",
+    "response_text": "Escalating this to the operations team immediately.",
+    "rationale": "Critical issue with SLA risk."
+  }'
+
+
+# ============================================================
+# 13. Step Environment — Phishing Ignore
+# ============================================================
+
+curl -X POST "https://vishalgulatinitj-email-triage-openenv.hf.space/api/step" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "classify_category": "phishing",
+    "classify_priority": "critical",
+    "schedule_action": "ignore",
+    "response_text": "",
+    "rationale": "Potential phishing email should not be replied to."
+  }'
+
+
+# ============================================================
+# 14. PPO Inference Endpoint
+# ============================================================
+
+curl -X POST "https://vishalgulatinitj-email-triage-openenv.hf.space/api/infer" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sender": "ops@company.com",
+    "subject": "ASAP: Production issue blocking users",
+    "body": "Customers are unable to access the product. Please resolve immediately.",
+    "received_hour": 10
+  }'
+
+
+# ============================================================
+# 15. Local Docker Testing
+# ============================================================
+
+docker build -t email-triage-openenv .
+
+docker run --rm -p 7860:7860 --name email-triage-test email-triage-openenv
+
+curl -X GET "http://localhost:7860"
+
+curl -X GET "http://localhost:7860/api/docs"
+
+curl -X GET "http://localhost:7860/api/openapi.json"
+
+curl -X GET "http://localhost:7860/api/compare_agents?num_episodes=10&checkpoint_path=training/checkpoints/ppo_email_triage.pt"
+
+
+# ============================================================
+# 16. Postman Import URL
+# ============================================================
+
+# Import this link into Postman:
+# https://vishalgulatinitj-email-triage-openenv.hf.space/api/openapi.json
+
+
 
 RUNNING DATA PIPELINE
 

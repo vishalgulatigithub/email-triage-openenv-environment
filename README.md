@@ -138,19 +138,39 @@ Streamlit Dashboard
 
 RUNNING DATA PIPELINE
 
+## 🚀 Running Data Pipeline
+
+> ⚠️ Make sure your virtual environment is activated before running the commands.
+
+```bash
+# 1. Run baseline
 python -m baseline.run_baseline
+
+# 2. Train PPO
 python -m training.train_ppo
+
+# 3. Generate reward plot
 python visualization/plot_rewards.py
+
+# 4. Generate curriculum plot (self-improvement)
 python visualization/plot_curriculum.py
+
+# 5. Evaluate agents
 python -m training.evaluate
+
+# 6. Compare agents
 python -m visualization.compare_agents
+
+# 7. Launch dashboard
 streamlit run visualization/dashboard.py
 
 
+
 Agent	Total Reward	Urgent Handled	Urgent Missed	SLA Breaches
-Random	-25.48	7.4	8.1	8.0
-Rule-Based	47.31	6.05	6.65	7.5
-PPO	13.72	14.9	0.0	~0
+Random
+Rule-Based	
+PPO 
+
 🧠 Key Insight
 Rule-based systems maximize reward (efficiency)
 PPO learns safety-first policy

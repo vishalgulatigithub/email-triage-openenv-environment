@@ -1,3 +1,13 @@
+---
+title: Email Triage OpenEnv
+emoji: 📬
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 🌍 Problem Story: Email Triage at Internet Scale
 
 Every day, billions of emails are sent across the internet.

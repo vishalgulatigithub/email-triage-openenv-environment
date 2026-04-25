@@ -1,43 +1,164 @@
 name: email-triage-openenv
-version: 0.1.0
-description: Multi-agent RL environment for enterprise email triage with adversarial emails, workload spikes, and SLA pressure
+version: 1.0.0
+description: >
+  Multi-agent reinforcement learning environment for enterprise email triage.
+  Supports adversarial emails, workload spikes, SLA constraints, and
+  self-improving curriculum learning.
 
+# ----------------------------
+# SERVER CONFIG (FastAPI backend)
+# ----------------------------
 server:
   host: 0.0.0.0
   port: 8000
 
+# ----------------------------
+# ENVIRONMENT
+# ----------------------------
 environment:
   module: app.env
   class: EmailEnv
+  description: >
+    Simulates a dynamic inbox with backlog, urgency, SLA deadlines,
+    adversarial emails, and workload spikes. Supports long-horizon
+    decision-making and curriculum-based self-improvement.
 
+# ----------------------------
+# API CONFIG
+# ----------------------------
 api:
   app_module: app.main
   app_variable: app
+  description: >
+    FastAPI backend exposing environment interaction, evaluation,
+    and comparison endpoints.
 
+# ----------------------------
+# AGENTS
+# ----------------------------
 agents:
   classifier:
     module: agents.classifier_agent
     function: classify_email
+    description: Predicts email category and urgency
+
   scheduler:
     module: agents.scheduler_agent
     function: schedule_email
+    description: Decides reply, escalate, defer, or ignore
+
   rule_based:
     module: agents.rule_based
     function: rule_based_agent
+    description: Heuristic baseline agent
+
   random:
     module: agents.random_agent
     function: random_agent
+    description: Random baseline
 
+  ppo:
+    module: training.train_ppo
+    class: PPOPolicy
+    description: Learned policy via PPO
+
+# ----------------------------
+# TRAINING
+# ----------------------------
 training:
   module: training.train_ppo
   function: train
+  description: >
+    PPO training loop with reward shaping and curriculum tracking.
 
+  parameters:
+    episodes: 400
+    learning_rate: 0.0001
+    gamma: 0.99
+    clip_epsilon: 0.2
+    entropy_coef: 0.01
+
+# ----------------------------
+# EVALUATION
+# ----------------------------
 evaluation:
   module: training.evaluate
   compare_function: compare_agents
   evaluate_function: evaluate_agent
 
+  metrics:
+    - total_reward
+    - urgent_handled
+    - urgent_missed
+    - sla_breaches
+    - safe_policy_score
+
+  description: >
+    Compares PPO, rule-based, and random agents across safety and efficiency metrics.
+
+# ----------------------------
+# SELF-IMPROVEMENT (NEW)
+# ----------------------------
+self_improvement:
+  enabled: true
+  module: app.self_improvement
+  class: CurriculumTracker
+
+  description: >
+    Tracks agent performance over time and assigns curriculum levels.
+    Higher levels correspond to harder scenarios such as adversarial emails,
+    tighter SLA deadlines, and workload spikes.
+
+  levels:
+    - level: 1
+      description: Easy environment (low adversarial, relaxed SLA)
+
+    - level: 2
+      description: Moderate difficulty (more urgency, moderate spikes)
+
+    - level: 3
+      description: Hard environment (phishing, spikes, strict SLA)
+
+# ----------------------------
+# ARTIFACTS
+# ----------------------------
 artifacts:
   checkpoint_dir: training/checkpoints
+  ppo_model: training/checkpoints/ppo_email_triage.pt
+
   rewards_csv: training/checkpoints/episode_rewards.csv
   reward_plot: visualization/reward_curve.png
+
+  curriculum_log: training/checkpoints/curriculum_log.txt
+  curriculum_plot: visualization/curriculum_progression.png
+
+# ----------------------------
+# UI / DEMO (IMPORTANT FOR HF)
+# ----------------------------
+ui:
+  dashboard: visualization/dashboard.py
+  description: >
+    Streamlit dashboard for comparing agents, visualizing metrics,
+    and demonstrating self-improvement behavior.
+
+# ----------------------------
+# FAILSAFE CONFIG (VERY IMPORTANT)
+# ----------------------------
+fallbacks:
+  if_checkpoint_missing:
+    use_rule_based: true
+    disable_ppo: false
+    message: >
+      PPO checkpoint not found. Using rule-based agent as fallback.
+
+# ----------------------------
+# TAGS (FOR DISCOVERY / JUDGING)
+# ----------------------------
+tags:
+  - reinforcement-learning
+  - multi-agent
+  - email-triage
+  - self-improving-agents
+  - curriculum-learning
+  - openenv
+  - decision-making

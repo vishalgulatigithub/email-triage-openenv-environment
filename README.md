@@ -136,6 +136,17 @@ Streamlit Dashboard
 <img width="1883" height="1020" alt="image" src="https://github.com/user-attachments/assets/59ab0a2c-7c0d-4a45-8094-bb7bb1a28f58" />
 
 
+RUNNING DATA PIPELINE
+
+python -m baseline.run_baseline
+python -m training.train_ppo
+python visualization/plot_rewards.py
+python visualization/plot_curriculum.py
+python -m training.evaluate
+python -m visualization.compare_agents
+streamlit run visualization/dashboard.py
+
+
 Agent	Total Reward	Urgent Handled	Urgent Missed	SLA Breaches
 Random	-25.48	7.4	8.1	8.0
 Rule-Based	47.31	6.05	6.65	7.5
@@ -321,3 +332,65 @@ visualization/
 
 data/
   emails.json
+
+
+Postman Friendly Curls
+
+1. START SERVER
+
+uvicorn app.main:app --reload
+
+
+2. RESET
+
+curl -X POST http://127.0.0.1:8000/reset
+
+
+3. STATE
+
+curl http://127.0.0.1:8000/state
+
+
+4. Manual step (simulate agent)
+
+curl -X POST http://127.0.0.1:8000/step
+-H "Content-Type: application/json"
+-d "{\"email_id\": \"seed-001\", \"classify_category\": \"complaint\", \"classify_priority\": \"high\", \"schedule_action\": \"reply\", \"response_text\": \"We are resolving your issue.\"}"
+
+
+Shows:
+
+reward
+grading
+metrics update
+
+
+5. EVALUATE RULE AGENT
+
+curl "http://127.0.0.1:8000/evaluate_agent?agent_type=rule&num_episodes=5"
+
+
+6.Evaluate PPO agent
+
+curl "http://127.0.0.1:8000/evaluate_agent?agent_type=ppo&num_episodes=5"
+
+
+7. Compare all agents (IMPORTANT)
+
+curl "http://127.0.0.1:8000/compare_agents?num_episodes=10"
+
+
+
+🧠 Optional: output (Windows PowerShell)
+
+curl "http://127.0.0.1:8000/compare_agents?num_episodes=10" | ConvertFrom-Json
+
+RUNNING DATA PIPELINE
+
+python -m baseline.run_baseline
+python -m training.train_ppo
+python visualization/plot_rewards.py
+python visualization/plot_curriculum.py
+python -m training.evaluate
+python -m visualization.compare_agents
+streamlit run visualization/dashboard.py

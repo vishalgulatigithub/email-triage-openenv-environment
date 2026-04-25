@@ -39,6 +39,11 @@ def main():
         """
     )
 
+    st.info(
+    "Self-improvement is tracked with a curriculum level derived from recent safety performance. "
+    "The tracker recommends harder scenarios only after the agent is stable, avoiding PPO collapse."
+    )
+
     st.sidebar.header("Evaluation Controls")
     num_episodes = st.sidebar.slider("Episodes per agent", 5, 50, 20, 5)
     checkpoint_path = st.sidebar.text_input(
@@ -94,6 +99,7 @@ def main():
 
         with st.expander("Raw comparison JSON"):
             st.json(comparison)
+        
 
 
 if __name__ == "__main__":

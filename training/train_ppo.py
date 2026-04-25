@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from app.self_improvement import CurriculumTracker
 import os
 from dataclasses import dataclass
 from typing import List, Tuple
@@ -209,6 +209,16 @@ def train():
 
     episode_rewards = []
 
+    curriculum_tracker = CurriculumTracker(window_size=10)
+    
+    os.makedirs("training/checkpoints", exist_ok=True)
+    
+    curriculum_log_path = "training/checkpoints/curriculum_log.txt"
+    
+    with open(curriculum_log_path, "w", encoding="utf-8") as f:f.write("episode,level,reward\n")
+
+    
+
     for episode in range(num_episodes):
         observation = env.reset()
         done = False
@@ -245,6 +255,16 @@ def train():
             observation = next_observation
 
         episode_rewards.append(total_reward)
+
+        # Minimal self-improvement tracking.
+        # This logs how difficulty should evolve based on agent performance.
+
+        final_metrics = getattr(env, "metrics", {})
+        curriculum_level = curriculum_tracker.update(final_metrics)
+
+        with open(curriculum_log_path, "a", encoding="utf-8") as f:f.write(f"{episode + 1},{curriculum_level},{total_reward:.4f}\n")
+
+        print(f"Self-Improvement Curriculum Level: {curriculum_level}")
 
         states = torch.stack([t.state for t in transitions]).to(device)
         category_actions = torch.tensor([t.category_action for t in transitions], dtype=torch.long).to(device)

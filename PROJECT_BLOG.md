@@ -31,7 +31,6 @@ This project turns email triage into a **multi-agent reinforcement learning envi
 | 💻 GitHub Repository | https://github.com/vishalgulatigithub/email-triage-openenv-environment |
 | 📄 FastAPI Docs | https://vishalgulatinitj-email-triage-openenv.hf.space/api/docs |
 | 🔌 OpenAPI Schema | https://vishalgulatinitj-email-triage-openenv.hf.space/api/openapi.json |
-| 🎥 YouTube Demo Video | Coming soon |
 
 ---
 

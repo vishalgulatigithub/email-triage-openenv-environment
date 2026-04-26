@@ -541,7 +541,6 @@ streamlit run visualization/dashboard.py
 | 🧪 Live App | https://vishalgulatinitj-email-triage-openenv.hf.space |
 | 📓 Google Colab Notebook | https://colab.research.google.com/drive/1N5sJ79Rzdh8hklnKkWSFqapJA5G1bWE_?usp=sharing |
 | 💻 GitHub Repository | https://github.com/vishalgulatigithub/email-triage-openenv-environment |
-| 🎥 YouTube Demo Video | Coming soon |
 | 📄 FastAPI Docs | https://vishalgulatinitj-email-triage-openenv.hf.space/api/docs |
 | 🔌 OpenAPI Schema | https://vishalgulatinitj-email-triage-openenv.hf.space/api/openapi.json |
 

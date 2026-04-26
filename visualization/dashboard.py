@@ -13,7 +13,7 @@ import streamlit as st
 from training.evaluate import compare_agents
 
 
-st.set_page_config(page_title="Email Triage RL Dashboard", layout="wide")
+st.set_page_config(page_title="From inbox chaos to self-improving enterprise ready decision-making Multi-Agent Self Learning Email Triage RL Dashboard", layout="wide")
 
 
 def flatten_agent_metrics(agent_name, result):
@@ -28,7 +28,7 @@ def flatten_agent_metrics(agent_name, result):
 
 
 def main():
-    st.title("Email Triage RL Benchmark Dashboard")
+    st.title("From inbox chaos to self-improving enterprise ready decision-making Multi-Agent Self Learning Email Triage RL Benchmark Dashboard")
     st.markdown(
         """
         Multi-agent reinforcement learning environment for enterprise email triage with:

@@ -7,7 +7,7 @@ from app.env import EmailEnv
 from app.models import Action
 from training.evaluate import compare_agents, evaluate_agent
 
-app = FastAPI(title="Email Triage OpenEnv", version="2.0.0")
+app = FastAPI(title="From inbox chaos to self-improving enterprise ready decision-making Multi-agent self Learning and Improving Email Triage OpenEnv", version="2.0.0")
 
 env = EmailEnv()
 
@@ -15,7 +15,7 @@ env = EmailEnv()
 @app.get("/")
 def root():
     return {
-        "name": "Email Triage OpenEnv",
+        "name": "From inbox chaos to self-improving enterprise ready decision-making Multi-agent Self Learning and Improving Email Triage OpenEnv",
         "version": "2.0.0",
         "description": "Multi-agent RL environment for enterprise email triage under workload spikes, adversarial emails, and SLA pressure.",
         "endpoints": [
@@ -85,7 +85,7 @@ def dashboard_view():
     html = """
     <html>
     <head>
-        <title>Email Triage RL Dashboard</title>
+        <title>From inbox chaos to self-improving enterprise ready decision-making Multi-agent Self Learning Email Triage RL Dashboard</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -115,9 +115,9 @@ def dashboard_view():
     </head>
     <body>
         <div class="card">
-            <h1>Email Triage RL Dashboard</h1>
+            <h1>From inbox chaos to self-improving enterprise ready decision-making Multi-agent self Learning Email Triage RL Dashboard</h1>
             <p>
-                Multi-agent reinforcement learning environment for enterprise email triage.
+                Multi-agent reinforcement learning environment enterprise ready email triage.
             </p>
             <ul>
                 <li>Classifier agent: category + priority</li>

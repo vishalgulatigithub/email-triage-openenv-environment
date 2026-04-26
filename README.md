@@ -531,3 +531,18 @@ python visualization/plot_curriculum.py
 python -m training.evaluate
 python -m visualization.compare_agents
 streamlit run visualization/dashboard.py
+
+
+## 🔗 Final Submission Resources
+
+| Resource | Link |
+|---|---|
+| 🚀 Hugging Face Space | https://huggingface.co/spaces/vishalgulatinitj/email-triage-openenv |
+| 🧪 Live App | https://vishalgulatinitj-email-triage-openenv.hf.space |
+| 📓 Google Colab Notebook | https://colab.research.google.com/drive/1N5sJ79Rzdh8hklnKkWSFqapJA5G1bWE_?usp=sharing |
+| 💻 GitHub Repository | https://github.com/vishalgulatigithub/email-triage-openenv-environment |
+| 🎥 YouTube Demo Video | Coming soon |
+| 📄 FastAPI Docs | https://vishalgulatinitj-email-triage-openenv.hf.space/api/docs |
+| 🔌 OpenAPI Schema | https://vishalgulatinitj-email-triage-openenv.hf.space/api/openapi.json |
+
+> Note: The Hugging Face Space opens the Streamlit dashboard at `/`, while FastAPI endpoints are exposed under `/api/*`.
